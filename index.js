@@ -6,10 +6,6 @@ const token = process.env.TELEGRAM_BOT_TOKEN
 const bot = new TelegramBot(token, { polling: true });
 
 let chatId;
-let rowanToUSD;
-let below_target;
-let above_target;
-let equal_target;
 let tokensAlerted = {
   'rowan': {
     priceInUSD: null,
