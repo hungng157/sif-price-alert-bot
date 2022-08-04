@@ -15,7 +15,9 @@ git clone https://github.com/hungng157/sif-price-alert-bot
 
 3. Set up the bot in [BotFather](https://core.telegram.org/bots#6-botfather) in Telegram and put the token inside the .env file as in .env-example
 
-4. Run the bot
+4. Update the ```tokenStats``` endpoint according to Sif-APIs in .env file
+
+5. Run the bot
 ```
 cd sif-price-alert-bot
 node index.js
