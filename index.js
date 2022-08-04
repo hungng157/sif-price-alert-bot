@@ -3,6 +3,7 @@ const TelegramBot = require("node-telegram-bot-api");
 const fetch = require("node-fetch");
 
 const token = process.env.TELEGRAM_BOT_TOKEN
+const tokenStatsEndpoint = process.env.TOKEN_STATS_ENDPOINT
 const bot = new TelegramBot(token, { polling: true });
 
 let chatId;
@@ -17,7 +18,7 @@ let tokensAlerted = {
  
 const getRowanToUSD = async () => {
   try {
-    const response = await fetch('http://localhost:8080/asset/tokenStats');
+    const response = await fetch(tokenStatsEndpoint);
     const data = await response.json();
     const rowanToUSD = Number(data['body']['rowanUSD']);
     return rowanToUSD;
@@ -28,7 +29,7 @@ const getRowanToUSD = async () => {
 
 const getTokenToUSD = async (token) => {
   try {
-    const response = await fetch('http://localhost:8080/asset/tokenStats');
+    const response = await fetch(tokenStatsEndpoint);
     const data = await response.json();
     const tokenData = data['body']['pools'].filter(item => item['symbol'] === token);
     const tokenToUSD = Number(tokenData[0]['priceToken']);
@@ -54,19 +55,16 @@ const alertTokenPrice = async (token, getTokenPriceFunc) => {
     bot.sendMessage(chatId, 
       `${token} price now is $${tokensAlerted[token].priceInUSD}, which is below your target of $${tokensAlerted[token].belowTarget}`
     );
-    tokensAlerted[token].belowTarget = null;
   }
   if (tokensAlerted[token].aboveTarget && tokensAlerted[token].priceInUSD > tokensAlerted[token].aboveTarget) {
     bot.sendMessage(chatId, 
       `${token} price now is $${tokensAlerted[token].priceInUSD}, which is above your target of $${tokensAlerted[token].aboveTarget}`
     );
-    tokensAlerted[token].aboveTarget = null;
   }
   if (tokensAlerted[token].equalTarget && tokensAlerted[token].priceInUSD == tokensAlerted[token].equalTarget) {
     bot.sendMessage(chatId, 
       `${token} price now is $${tokensAlerted[token].priceInUSD}, which is equal to your target of $${tokensAlerted[token].equalTarget}`
     );
-    tokensAlerted[token].equalTarget = null;
   }
 }
 
@@ -78,7 +76,7 @@ const alertTokens = () => {
   })
 }
 
-setInterval(alertTokens, 1000);
+setInterval(alertTokens, 5000);
 
 bot.onText(/\/help/, async (msg) => {
   const { chat: { id }, _text } = msg;
